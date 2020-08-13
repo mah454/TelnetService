@@ -37,9 +37,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class TelnetSocketServer implements Closeable {
-
+    private static final Logger logger = ToolkitLogger.newInstance(TelnetSocketServer.class.getName()).getLogger();
     private static final TelnetSocketServer telnetSocketServer = new TelnetSocketServer();
     private ServerSocket serverSocket;
     private static int PORT;
@@ -95,6 +96,10 @@ public class TelnetSocketServer implements Closeable {
         scanPackages();
         try {
             serverSocket = new ServerSocket(PORT);
+            if (!serverSocket.isClosed()) {
+                logger.info("Server started success .");
+                logger.info("Listen on port: " + PORT);
+            }
             while (!serverSocket.isClosed()) {
                 Socket socket = serverSocket.accept();
                 new TelnetSocketThread(socket, prompt, objectStoreList).start();

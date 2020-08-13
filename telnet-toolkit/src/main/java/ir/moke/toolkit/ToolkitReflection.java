@@ -18,6 +18,7 @@ import ir.moke.toolkit.api.CLI;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -32,7 +33,8 @@ public class ToolkitReflection {
     public List<Class<?>> getCommandClass(String packageName) {
         List<Class<?>> classList = new ArrayList<>();
         String packagePath = packageName.replaceAll("\\.", "/");
-        URL systemResource = ClassLoader.getSystemResource(packagePath);
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        URL systemResource = classLoader.getResource(packagePath);
         if (systemResource != null) {
             String path = systemResource.getPath();
             File filePath = new File(path);

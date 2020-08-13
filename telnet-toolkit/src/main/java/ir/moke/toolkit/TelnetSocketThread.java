@@ -48,35 +48,37 @@ public class TelnetSocketThread extends Thread {
             while (!socket.isClosed()) {
                 writePrompt(bufferedWriter);
                 String str = bufferedReader.readLine();
-                System.out.println(">> : " + str);
                 if (str != null) {
                     for (byte aByte : str.getBytes()) {
                         if (((int) aByte) < 0) {
                             socket.close();
                         }
                     }
-                    if (str.equalsIgnoreCase("quit")) {
-                        socket.close();
-                    }
-                    if (str.equals("")) {
-                        continue;
-                    } else {
-                        String[] s = str.split(" ");
-                        List<ObjectStore> objectStoreList = this.objectStoreList.stream()
-                                .filter(e -> e.getCommand().equals(s[0]))
-                                .collect(toList());
-                        if (!objectStoreList.isEmpty()) {
-                            Optional<ObjectStore> optionalObjectStore;
-                            if (s.length == 1) {
-                                optionalObjectStore = objectStoreList.stream().filter(e -> e.getAction() == null).findFirst();
-                            } else {
-                                optionalObjectStore = objectStoreList.stream().filter(e -> e.getAction().equals(s[1])).findFirst();
-                            }
-
-                            optionalObjectStore.ifPresent(objectStore -> invokeCommand(objectStore, bufferedWriter, str));
-
+                    if (!socket.isClosed()) {
+                        if (str.equalsIgnoreCase("quit")) {
+                            socket.close();
+                            break;
+                        }
+                        if (str.equals("")) {
+                            continue;
                         } else {
-                            printUnknownInformation(bufferedWriter);
+                            String[] s = str.split(" ");
+                            List<ObjectStore> objectStoreList = this.objectStoreList.stream()
+                                    .filter(e -> e.getCommand().equals(s[0]))
+                                    .collect(toList());
+                            if (!objectStoreList.isEmpty()) {
+                                Optional<ObjectStore> optionalObjectStore;
+                                if (s.length == 1) {
+                                    optionalObjectStore = objectStoreList.stream().filter(e -> e.getAction() == null).findFirst();
+                                } else {
+                                    optionalObjectStore = objectStoreList.stream().filter(e -> (s[1]).matches(e.getAction())).findAny();
+                                }
+
+                                optionalObjectStore.ifPresent(objectStore -> invokeCommand(objectStore, bufferedWriter, str));
+
+                            } else {
+                                printUnknownInformation(bufferedWriter);
+                            }
                         }
                     }
                 }
@@ -116,11 +118,9 @@ public class TelnetSocketThread extends Thread {
                             }
                         }
                         if (!added) {
-                            assignParameters(values,parameter,null);
+                            assignParameters(values, parameter, cmdLine.replaceAll(".* ", ""));
                         }
                     }
-                    System.out.println(method.getParameterCount());
-                    System.out.println(values.size());
                     result = (String) method.invoke(objectStore.getInstance(), values.toArray());
                 } else {
                     result = (String) method.invoke(object);

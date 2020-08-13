@@ -23,5 +23,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(PARAMETER)
 @Retention(RUNTIME)
 public @interface Option {
-    String value();
+    String value() default "";
 }

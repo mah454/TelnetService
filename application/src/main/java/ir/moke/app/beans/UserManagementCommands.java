@@ -83,7 +83,6 @@ public class UserManagementCommands implements TtyAsciiCodecs {
         return result.toString();
     }
 
-
     public static void main(String[] args) {
         UserManagementCommands umc = new UserManagementCommands();
         String newUser = umc.createUser("dsa", "dsadas", "dsadas", "dsada", 12);
