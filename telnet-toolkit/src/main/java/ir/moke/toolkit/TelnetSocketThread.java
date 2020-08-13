@@ -103,18 +103,25 @@ public class TelnetSocketThread extends Thread {
             if (parts.length > 1) {
                 List<Parameter> parameterList = Arrays.asList(method.getParameters());
                 if (parameterList.size() > 0) {
-                    List<String> values = new ArrayList<>();
+                    List<Object> values = new ArrayList<>();
                     for (Parameter parameter : parameterList) {
                         String parameterName = parameter.getAnnotation(Option.class).value();
+                        boolean added = false;
                         for (int i = 2; i < parts.length; i++) {
                             String key = parts[i].split("=")[0];
                             String value = parts[i].split("=")[1];
                             if (key.equals(parameterName)) {
-                                values.add(value);
+                                assignParameters(values, parameter, value);
+                                added = true;
                             }
                         }
+                        if (!added) {
+                            assignParameters(values,parameter,null);
+                        }
                     }
-                    result = (String) method.invoke(objectStore.getInstance(), values);
+                    System.out.println(method.getParameterCount());
+                    System.out.println(values.size());
+                    result = (String) method.invoke(objectStore.getInstance(), values.toArray());
                 } else {
                     result = (String) method.invoke(object);
                 }
@@ -126,6 +133,26 @@ public class TelnetSocketThread extends Thread {
             bufferedWriter.flush();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void assignParameters(List<Object> values, Parameter parameter, String value) {
+        if (parameter.getType().isAssignableFrom(String.class)) {
+            if (value != null) {
+                values.add(value);
+            } else {
+                values.add("");
+            }
+        } else if (parameter.getType().isAssignableFrom(int.class)) {
+            if (value != null) {
+                values.add(Integer.parseInt(value, 10));
+            } else {
+                values.add(0);
+            }
+        } else if (parameter.getType().isAssignableFrom(double.class)) {
+            values.add(Double.parseDouble(value));
+        } else if (parameter.getType().isAssignableFrom(long.class)) {
+            values.add(Long.parseLong(value, 10));
         }
     }
 

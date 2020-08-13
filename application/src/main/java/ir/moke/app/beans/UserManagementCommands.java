@@ -59,11 +59,14 @@ public class UserManagementCommands implements TtyAsciiCodecs {
                     .append(RESET)
                     .append("\n");
         } else {
-            result.append(BLINK)
-                    .append(GREEN)
+            result.append(GREEN)
                     .append("List size [")
                     .append(BLINK)
+                    .append(BOLD)
+                    .append(BLUE)
                     .append(USER_LIST.size())
+                    .append(RESET)
+                    .append(GREEN)
                     .append("]")
                     .append(RESET)
                     .append("\n");

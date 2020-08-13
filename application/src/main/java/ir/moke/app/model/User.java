@@ -20,7 +20,7 @@ public class User {
     /*
      * |Username        |EmailAddress       |Name       |Family         |age    |
      */
-    private static final String printFormat = "|%-5d|%-20s|%-20s|%-20s|%-20s|%-4d|";
+    private static final String printFormat = "|%-5d|%-20s|%-20s|%-20s|%-20s|%-4s|";
     private int id;
     private String username;
     private String emailAddress;
@@ -93,6 +93,6 @@ public class User {
                 getEmailAddress(),
                 getName(),
                 getFamily(),
-                age);
+                age != 0 ? age : "");
     }
 }
